@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import axios from 'axios';
 import cities from './data/city.list.json';
+import Citycard from './components/Citycard';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+
 class App extends Component {
   constructor() {
     super()
@@ -9,7 +13,9 @@ class App extends Component {
       cities: cities,
       selectedCities: [],
       query: '',
-      current: ''
+      current: '',
+      random: '',
+      country: ''
     }
   }
   
@@ -22,36 +28,46 @@ class App extends Component {
     let selectedCities = [];
     oldCities.map(elem => elem.name.toLowerCase().includes(e.target.value.toLowerCase()) ? selectedCities.push(elem) : null);
     selectedCities = selectedCities.slice(0, 100)
+    selectedCities = e.target.value === '' ? [] : selectedCities;
     this.setState({ query: e.target.value, selectedCities: selectedCities })
   }
 
   handleClick = (e) => {
     const { id } = e.target;
+    const country = e.target.innerHTML.split(',')[1];
+    console.log(e)
     axios.get(`https://api.openweathermap.org/data/2.5/weather?id=${id}&appid=${process.env.REACT_APP_API_KEY}`)
-      .then(res => { console.log(res); this.setState({ selectedCities: [], query: '', current: res.data })})
+      .then(res => this.setState({ selectedCities: [], query: '', current: res.data, country }))
   }
 
+  handleClickRandom = () => {
+    const { cities } = this.state;
+    const {id} = cities[Math.round(Math.random() * cities.length)];
+    axios.get(`https://api.openweathermap.org/data/2.5/weather?id=${id}&appid=${process.env.REACT_APP_API_KEY}`)
+    .then(res => this.setState({ selectedCities: [], query: '', current: res.data}))
+  }
+
+  deleteCurrent = () => this.setState({ current: '' });
+  deleteRandom = () => this.setState({ random: '' });
+
   render() {
-    const { query, selectedCities, current } = this.state;
+    const { query, selectedCities, current, random, country } = this.state;
     return (
-      <div className="app flex flex-col m-auto h-full w-full">
-        <div className="bg-gray-100 bg-opacity-50 rounded-3xl flex flex-col items-center justify-center mt-20 mx-auto w-9/12 h-20 mb-5">
-        <Link to="/"><h1 className="text-2xl text-white">Weather app</h1></Link>
-          </div>
-        <form>
-          <input type="text" onChange={this.handleChange} value={query} className="border block bg-transparent rounded-md m-auto p-3" placeholder="Type your city..."/>
-          <div className="text-center h-10">
-            {selectedCities.map((city, index) => <h1 key={index} id={city.id} onClick={this.handleClick}>{city.name}</h1>)}
+      <div className="app flex flex-col items-center h-full w-full pt-32">
+        <Link to="/" className="flex items-start justify-center text-5xl text-white mb-5">
+          <h1>Weather app</h1>
+        </Link>
+        <form className="text-center w-80">
+          <div className="bg-gray-100 bg-opacity-30 flex items-center justify-start rounded-full p-3 px-9">
+            <input type="text" onChange={this.handleChange} value={query} className="bg-transparent placeholder-white text-xl w-full" placeholder="Type your city..." />
+            <FontAwesomeIcon icon={faSearch} className="text-white"/> 
+            </div>
+          <div className="mx-auto h-10 pl-9 text-left"> 
+            {selectedCities.map((city, index) => <h1 key={index} id={city.id} className="cursor-pointer" onClick={this.handleClick}>{city.name}, {city.country}</h1>)}
           </div>
         </form>
-        {current ? <div className="mx-auto">
-          <h1 className="text-2xl">{current.name}</h1>
-          <p>Current weather: {current.weather.description} </p>
-          <p>Temperature: {Math.round(((current.main.temp-273.15)*1.8)+32)} ºF / {Math.round(current.main.temp-273.15)} ºC </p>
-          <p>Humidity: {current.main.humidity} %</p>
-          <p>Wind speed: {Math.round(current.wind.speed)}m/s</p>
-          </div> : ''
-          }
+        {current ? <Citycard city={current} country={country} handleClick={this.deleteCurrent}/> : random ? <Citycard city={random} country={country} handleClick={this.deleteRandom}/> : ''}
+        <h1 className="cursor-pointer text-gray-500 absolute bottom-10 text-lg" onClick={this.handleClickRandom}>Check a random city</h1>
       </div>
     );
   }
