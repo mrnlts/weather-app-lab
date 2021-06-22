@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,9 +13,10 @@ class Home extends Component {
       city: '',
       country: '',
       currentWeather: '',
-      isRed: false,
+      isFavorite: false,
       query: '',
       selectedCities: [],
+      favoriteCities: [],
     };
   }
 
@@ -36,6 +38,7 @@ class Home extends Component {
   };
 
   handleClick = e => {
+    const { favoriteCities } = this.state;
     const { innerHTML, id } = e.target;
     const city = innerHTML.split(',')[0];
     const country = innerHTML.split(',')[1];
@@ -45,13 +48,15 @@ class Home extends Component {
       .get(
         `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${process.env.REACT_APP_API_KEY}`,
       )
-      .then(res =>
-        this.setState({ selectedCities: [], query: '', city, currentWeather: res.data, country, isRed: false }),
-      );
+      .then(res => {
+        const isFavorite = favoriteCities.includes(city);
+        this.setState({ selectedCities: [], query: '', city, country, currentWeather: res.data, isFavorite });
+      });
   };
 
   handleClickRandom = () => {
     const { cities } = this.state;
+    const { favoriteCities } = this.state;
     const index = Math.round(Math.random() * cities.length);
     const lat = cities[index].coord.lat;
     const lon = cities[index].coord.lon;
@@ -61,31 +66,43 @@ class Home extends Component {
       .get(
         `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${process.env.REACT_APP_API_KEY}`,
       )
-      .then(res =>
-        this.setState({
-          selectedCities: [],
-          query: '',
-          city,
-          country,
-          currentWeather: res.data,
-          isRed: false,
-          displayForecast: false,
-        }),
-      );
+      .then(res => {
+        const isFavorite = favoriteCities.includes(city);
+        this.setState({ selectedCities: [], query: '', city, country, currentWeather: res.data, isFavorite });
+      });
   };
 
-  handleHeart = () => {
-    const { isRed } = this.state;
-    this.setState({ isRed: !isRed });
+  handleHeart = (city, lat, lon) => {
+    const { isFavorite, favoriteCities } = this.state;
+    const newFavorites = [...favoriteCities];
+    if (!isFavorite) {
+      if (newFavorites.indexOf(city) === -1) {
+        axios
+          .get(
+            `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${process.env.REACT_APP_API_KEY}`,
+          )
+          .then(res => {
+            newFavorites.push({ city, forecast: res.data });
+            this.setState({ isFavorite: !isFavorite, favoriteCities: newFavorites });
+          });
+      }
+    } else {
+      newFavorites.splice(newFavorites.indexOf(city), 1);
+      this.setState({ isFavorite: !isFavorite, favoriteCities: newFavorites });
+    }
   };
+
+  handleFavorites = e => this.props.getFavorites(e, this.state.favoriteCities);
 
   deleteCurrent = () => this.setState({ currentWeather: '', currentID: '' });
 
   render() {
-    const { query, selectedCities, currentWeather, isRed, country, lat, lon, city } = this.state;
-    const { handleChange, handleClick, handleClickRandom, deleteCurrent } = this;
+    const { query, selectedCities, currentWeather, isFavorite, country, lat, lon, city } = this.state;
+    const { handleChange, handleClick, handleClickRandom, deleteCurrent, handleFavorites } = this;
+    const { displayHome } = this.props;
+
     return (
-      <div className="flex flex-col items-center">
+      <div className={`flex flex-col items-center ${!displayHome && 'hidden'}`}>
         <form className="text-center w-80">
           <div className="bg-gray-100 bg-opacity-30 flex items-center justify-start rounded-full p-3 px-9">
             <input
@@ -121,15 +138,20 @@ class Home extends Component {
             lon={lon}
             handleClick={deleteCurrent}
             handleHeart={this.handleHeart}
-            isRed={isRed}
+            isFavorite={isFavorite}
           />
         ) : (
           ''
         )}
-
-        <h1 className="cursor-pointer text-gray-400 absolute bottom-3 text-lg md:bottom-10" onClick={handleClickRandom}>
-          Check a random city
-        </h1>
+        <div className="flex absolute bottom-3 md:bottom-10 text-lg ">
+          <h1 className="text-gray-400 cursor-pointer" onClick={handleClickRandom}>
+            Random city
+          </h1>
+          <span> || </span>
+          <Link to="/favorites" className="text-gray-400 cursor-pointer" onClick={handleFavorites}>
+            My favorites
+          </Link>
+        </div>
       </div>
     );
   }

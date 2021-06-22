@@ -12,8 +12,8 @@ class Citycard extends Component {
     };
   }
 
-  handleHeart = () => {
-    this.props.handleHeart();
+  handleHeart = (city, lat, lon) => {
+    this.props.handleHeart(city, lat, lon);
   };
 
   handleForecast = () => {
@@ -22,8 +22,8 @@ class Citycard extends Component {
   };
 
   render() {
-    const { city, currentWeather, country, handleClick, isRed } = this.props;
-    const { current, daily } = currentWeather;
+    const { city, currentWeather, country, handleClick, isFavorite } = this.props;
+    const { current, daily, lat, lon } = currentWeather;
     const { humidity, temp, weather, wind_speed } = current;
     const { displayForecast } = this.state;
     const currentIcon = () => {
@@ -54,8 +54,8 @@ class Citycard extends Component {
           />
           <FontAwesomeIcon
             icon={faHeart}
-            className={`text-white text-xl ${isRed && 'text-red-500'}`}
-            onClick={this.handleHeart}
+            className={`text-white text-xl ${isFavorite && 'text-red-500'}`}
+            onClick={() => this.handleHeart(city, lat, lon)}
           />
         </div>
         <Forecast forecast={daily} icons={icons} displayForecast={displayForecast} />

@@ -46,7 +46,11 @@ const icons = [
     {
       type: 'Mist',
       icon: faSmog,
-    },
+  },
+  {
+    type: 'Haze',
+    icon: faSmog,
+  },
 ];
   
 export default icons;
