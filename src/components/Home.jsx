@@ -31,8 +31,8 @@ class Home extends Component {
       elem.name.toLowerCase().includes(e.target.value.toLowerCase()) ? selectedCities.push(elem) : null,
     );
     selectedCities = selectedCities
-      .slice(0, 100)
-      .filter((v, i, a) => a.findIndex(t => t.place === v.place && t.name === v.name) === i);
+      .slice(0, 1000)
+      .filter((v, i, a) => a.findIndex(t => t.country === v.country && t.name === v.name) === i);
     selectedCities = e.target.value === '' ? [] : selectedCities;
     this.setState({ query: e.target.value, selectedCities: selectedCities });
   };
