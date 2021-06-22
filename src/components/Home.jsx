@@ -4,7 +4,6 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Citycard from './Citycard';
 import cities from '../data/city.list.json';
-
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -29,7 +28,9 @@ class Home extends Component {
     oldCities.map(elem =>
       elem.name.toLowerCase().includes(e.target.value.toLowerCase()) ? selectedCities.push(elem) : null,
     );
-    selectedCities = selectedCities.slice(0, 100);
+    selectedCities = selectedCities
+      .slice(0, 100)
+      .filter((v, i, a) => a.findIndex(t => t.place === v.place && t.name === v.name) === i);
     selectedCities = e.target.value === '' ? [] : selectedCities;
     this.setState({ query: e.target.value, selectedCities: selectedCities });
   };
@@ -55,11 +56,22 @@ class Home extends Component {
     const lat = cities[index].coord.lat;
     const lon = cities[index].coord.lon;
     const city = cities[index].name;
+    const country = cities[index].country;
     axios
       .get(
         `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,alerts&appid=${process.env.REACT_APP_API_KEY}`,
       )
-      .then(res => this.setState({ selectedCities: [], query: '', city, currentWeather: res.data, isRed: false }));
+      .then(res =>
+        this.setState({
+          selectedCities: [],
+          query: '',
+          city,
+          country,
+          currentWeather: res.data,
+          isRed: false,
+          displayForecast: false,
+        }),
+      );
   };
 
   handleHeart = () => {
@@ -69,12 +81,9 @@ class Home extends Component {
 
   deleteCurrent = () => this.setState({ currentWeather: '', currentID: '' });
 
-  deleteRandom = () => this.setState({ randomWeather: '', currentID: '' });
-
   render() {
-    const { query, selectedCities, currentWeather, isRed, random, country, lat, lon, city } = this.state;
-    const { handleChange, handleClick, handleClickRandom, deleteCurrent, deleteRandom } = this;
-
+    const { query, selectedCities, currentWeather, isRed, country, lat, lon, city } = this.state;
+    const { handleChange, handleClick, handleClickRandom, deleteCurrent } = this;
     return (
       <div className="flex flex-col items-center">
         <form className="text-center w-80">
@@ -89,7 +98,7 @@ class Home extends Component {
             <FontAwesomeIcon icon={faSearch} className="text-white" />
           </div>
 
-          <div className="mx-auto h-10 pl-9 text-left">
+          <div className="mx-auto pl-9 text-left">
             {selectedCities.map((city, index) => (
               <h1
                 key={index}
@@ -110,18 +119,7 @@ class Home extends Component {
             country={country}
             lat={lat}
             lon={lon}
-            handleHeart={this.handleHeart}
             handleClick={deleteCurrent}
-            isRed={isRed}
-          />
-        ) : random ? (
-          <Citycard
-            city={city}
-            currentWeather={random}
-            country={country}
-            lat={lat}
-            lon={lon}
-            handleClick={deleteRandom}
             handleHeart={this.handleHeart}
             isRed={isRed}
           />
@@ -129,7 +127,7 @@ class Home extends Component {
           ''
         )}
 
-        <h1 className="cursor-pointer text-gray-500 absolute bottom-10 text-lg" onClick={handleClickRandom}>
+        <h1 className="cursor-pointer text-gray-400 absolute bottom-3 text-lg md:bottom-10" onClick={handleClickRandom}>
           Check a random city
         </h1>
       </div>
