@@ -12,7 +12,7 @@ const Favorites = props => {
     <div className={`my-auto bg-gray-800 bg-opacity-30 p-2 rounded ${!displayFavorites && 'hidden'}`}>
       <ul>
         {myFavorites.length === 0 ? (
-          <li>You have no current favorites!</li>
+          <li className="text-white flex">You have no current favorites!</li>
         ) : (
           myFavorites.map((city, index) => {
             const { forecast } = city;
@@ -36,7 +36,11 @@ const Favorites = props => {
           })
         )}
       </ul>
-      <Link to="/" className="text-white absolute bottom-3 left-36 md:bottom-10 text-lg mx-auto w-24" onClick={getHome}>
+      <Link
+        to="/"
+        className="text-white absolute bottom-3 left-1/2 md:bottom-10 text-lg w-24"
+        onClick={e => getHome(e, myFavorites)}
+      >
         Back home
       </Link>
     </div>

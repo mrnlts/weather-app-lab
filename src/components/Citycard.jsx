@@ -26,6 +26,7 @@ class Citycard extends Component {
     const { current, daily, lat, lon } = currentWeather;
     const { humidity, temp, weather, wind_speed } = current;
     const { displayForecast } = this.state;
+    const weatherDescription = weather[0].description;
     const currentIcon = () => {
       const icon = icons.find(obj => obj.type === weather[0].main);
       return icon ? <FontAwesomeIcon icon={icon.icon} /> : '';
@@ -35,16 +36,18 @@ class Citycard extends Component {
         <span className="relative -top-3 ml-2 left-60 pl-1 w-20">
           <FontAwesomeIcon icon={faTimesCircle} className="text-white text-2xl" onClick={handleClick} />
         </span>
-        <div className="mt-0">
+        <div className="mt-0 text-center">
           <h1 className="text-2xl">
             {city}, {country} <span> </span>
             {currentIcon()}
           </h1>
 
-          <p>Current weather: {weather[0].description} </p>
-          <p>Temperature: {Math.round(temp - 273.15)} º </p>
+          <p className="text-sm">
+            {weatherDescription.replace(weatherDescription.split('')[0], weatherDescription.split('')[0].toUpperCase())}
+          </p>
+          <p className="text-5xl">{Math.round(temp - 273.15)} º </p>
           <p>Humidity: {humidity} %</p>
-          <p>Wind speed: {Math.round(wind_speed)} m/s</p>
+          <p>Wind: {Math.round(wind_speed)} m/s</p>
         </div>
         <div className="text-center pt-3 pb-2">
           <FontAwesomeIcon

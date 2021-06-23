@@ -9,7 +9,7 @@ class Forecast extends Component {
       return icon ? <FontAwesomeIcon icon={icon.icon} /> : '';
     };
     return (
-      <div className={!displayForecast && 'hidden'}>
+      <div className={`${!displayForecast && 'hidden'}`}>
         <div className="flex flex-col bg-gray-800 bg-opacity-30 py-2 rounded">
           <div>
             {forecast.map((dailyForecast, index) => {

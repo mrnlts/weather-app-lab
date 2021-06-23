@@ -16,7 +16,7 @@ class Home extends Component {
       isFavorite: false,
       query: '',
       selectedCities: [],
-      favoriteCities: [],
+      favoriteCities: this.props.myFavorites,
     };
   }
 
@@ -100,7 +100,6 @@ class Home extends Component {
     const { query, selectedCities, currentWeather, isFavorite, country, lat, lon, city } = this.state;
     const { handleChange, handleClick, handleClickRandom, deleteCurrent, handleFavorites } = this;
     const { displayHome } = this.props;
-
     return (
       <div className={`flex flex-col items-center ${!displayHome && 'hidden'}`}>
         <form className="text-center w-80">

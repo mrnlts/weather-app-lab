@@ -34,10 +34,10 @@ class App extends Component {
         <h1 className="flex items-start justify-center text-5xl text-white mb-5 pt-10 md:pt-32">Weather app</h1>
         <Switch>  
           <Route exact path="/favorites">
-            {displayFavorites ? <Favorites getHome={this.showHome} myFavorites={myFavorites} displayFavorites={displayFavorites} /> : <Redirect to="/"> <Home getFavorites={this.showFavorites} displayHome={displayHome} /></Redirect> }
+            {displayFavorites ? <Favorites getHome={this.showHome} myFavorites={myFavorites} displayFavorites={displayFavorites} /> : <Redirect to="/"> <Home getFavorites={this.showFavorites} myFavorites={myFavorites} displayHome={displayHome} /></Redirect> }
           </Route>
           <Route exact path="/">
-            {displayHome ? <Home getFavorites={this.showFavorites} displayHome={displayHome} /> : <Redirect to="/favorites"> <Favorites myFavorites={myFavorites} displayFavorites={displayFavorites}/></Redirect> }
+            {displayHome ? <Home getFavorites={this.showFavorites} displayHome={displayHome} myFavorites={myFavorites} /> : <Redirect to="/favorites"> <Favorites getHome={this.showHome} myFavorites={myFavorites} displayFavorites={displayFavorites}/></Redirect> }
           </Route>
         </Switch>
       </div>
