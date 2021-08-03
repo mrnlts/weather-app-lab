@@ -30,9 +30,10 @@ class Home extends Component {
     oldCities.map(elem =>
       elem.name.toLowerCase().includes(e.target.value.toLowerCase()) ? selectedCities.push(elem) : null,
     );
-    selectedCities = selectedCities
-      .slice(0, 1000)
-      .filter((v, i, a) => a.findIndex(t => t.country === v.country && t.name === v.name) === i);
+    selectedCities = selectedCities.slice(0, 1000).filter((v, i, a) => {
+      console.log('v: ', v, 'i: ', i, 'a: ', a);
+      return a.findIndex(t => t.country === v.country && t.name === v.name) === i;
+    });
     selectedCities = e.target.value === '' ? [] : selectedCities;
     this.setState({ query: e.target.value, selectedCities: selectedCities });
   };

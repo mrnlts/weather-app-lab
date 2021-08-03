@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import axios from 'axios';
 import Favorites from './components/Favorites';
 import Home from './components/Home';
 class App extends Component {
@@ -11,10 +10,6 @@ class App extends Component {
       displayHome: true,
       displayFavorites: false,
     }
-  }
-
-  getFavoritesForecast = () => {
-    axios.get()
   }
 
   showFavorites = (e, arr) => {
